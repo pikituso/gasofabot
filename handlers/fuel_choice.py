@@ -3,6 +3,7 @@ from telegram.ext import ContextTypes
 from services.fuel_api import get_gas_stations
 from services.geo import safe_coords, haversine
 from utils.format import format_station
+from handlers.bot_states import DISTANCIA, CARBURANTE
 
 FUEL_MAP = {
     "Gasolina 95": "Precio Gasolina 95 E5",
@@ -26,7 +27,8 @@ async def fuel_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     estaciones = get_gas_stations()
     resultados = []
 
-    # Filtrar y calcular distancias
+    distancia_max = context.user_data.get("distancia", 15)
+
     for e in estaciones:
         try:
             tipo_venta = e.get("Tipo Venta", "").strip().lower()
@@ -35,29 +37,29 @@ async def fuel_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             est_lat, est_lon = safe_coords(e)
             distancia = haversine(lat, lon, est_lat, est_lon)
-
-            precio_str = e.get(fuel_field, "").replace(",", ".")
-            if not precio_str:
-                continue
-            precio = float(precio_str)
-
+            precio_str = e.get(fuel_field, "")
+            print(f"Estación: {e.get('Dirección', 'Sin dirección')}, Precio ({fuel_field}): {precio_str}")
+            try:
+                precio = float(precio_str.replace(",", "."))
+            except ValueError:
+                precio = 9999  # Valor alto si no hay precio
             resultados.append({
                 "estacion": e,
                 "distancia": distancia,
                 "precio": precio
             })
         except Exception as ex:
-            print(f"Error procesando estación: {ex}")
+            print("Error procesando estación:", ex)
             continue
 
-    # Ordenar por precio
     resultados = sorted(resultados, key=lambda x: x["precio"])
-    top = [r for r in resultados if r["distancia"] <= 25][:3]
+    top = [r for r in resultados if r["distancia"] <= distancia_max and r["precio"] < 9999][:3]
 
     if top:
         mensajes = []
         for i, r in enumerate(top, 1):
-            mensajes.append(format_station(r["estacion"], r["distancia"], i, fuel_field, fuel))
+            precio_mostrar = "N/D" if r["precio"] == 9999 else f"{r['precio']:.3f}"
+            mensajes.append(format_station(r["estacion"], r["distancia"], precio_mostrar, i, fuel))
         await update.message.reply_text(
             "\n\n".join(mensajes),
             parse_mode="Markdown",

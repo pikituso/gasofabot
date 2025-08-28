@@ -1,0 +1,1 @@
+DISTANCIA, CARBURANTE = range(2)

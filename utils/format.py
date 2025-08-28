@@ -1,17 +1,18 @@
-def format_station(estacion, distancia, idx, fuel_field, fuel_name):
-    nombre = estacion.get("Rótulo", "Desconocido").title()
-    direccion = estacion.get("Dirección", "")
-    poblacion = estacion.get("Municipio", "")
-    est_lat = estacion.get("Latitud", "").replace(",", ".")
-    est_lon = estacion.get("Longitud (WGS84)", "").replace(",", ".")
-
-    precio_raw = estacion.get(fuel_field, "")
-    precio = precio_raw.replace(",", ".") if precio_raw else "N/D"
-
+def format_station(estacion, distancia, precio, orden, fuel_name):
+    direccion = estacion.get("Dirección", "Sin dirección")
+    municipio = estacion.get("Municipio", "")
+    provincia = estacion.get("Provincia", "")
+    nombre = estacion.get("Rótulo", "")
+    lat = estacion.get("Latitud", None).replace(",", ".")
+    lon = estacion.get("Longitud (WGS84)", None).replace(",", ".")
+    precio_str = precio if precio == "N/D" else f"{precio} €"
+    maps_url = ""
+    if lat and lon:
+        maps_url = f"[Ver en Google Maps](https://www.google.com/maps/search/?api=1&query={lat},{lon})"
     return (
-        f"*{idx}. {nombre}*\n"
-        f"📍 {direccion}, {poblacion}\n"
-        f"🚗 {distancia:.1f} km\n"
-        f"⛽ {fuel_name}: {precio} €\n"
-        f"[Ver en Google Maps](https://www.google.com/maps/search/?api=1&query={est_lat},{est_lon})"
+        f"*{orden}. {nombre}*\n"
+        f"📍 _{direccion}, {municipio}, {provincia}_\n"
+        f"🚗 Distancia: {distancia:.2f} km\n"
+        f"⛽ {fuel_name}: {precio_str}\n"
+        f"{maps_url}"
     )
