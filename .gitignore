@@ -1,0 +1,4 @@
+gasolineras_cache.json
+__pycache__
+.env
+config.py
