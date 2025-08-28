@@ -1,10 +1,11 @@
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, CallbackQueryHandler
 from config import TOKEN
 from handlers.start import start
 from handlers.location import location
 from handlers.fuel_choice import fuel_choice
 from handlers.distance_choice import ask_distance, set_distance
-from handlers.bot_states import DISTANCIA, CARBURANTE
+from handlers.options import handle_options
+from handlers.bot_states import DISTANCIA, CARBURANTE, OPCIONES
 
 def main():
     app = Application.builder().token(TOKEN).build()
@@ -19,8 +20,12 @@ def main():
             CARBURANTE: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, fuel_choice),
             ],
+            OPCIONES: [
+                CallbackQueryHandler(handle_options),
+            ],
         },
         fallbacks=[CommandHandler("start", start)],
+        per_message=False  # Déjalo así por ahora
     )
 
     app.add_handler(conv_handler)

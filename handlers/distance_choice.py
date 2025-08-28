@@ -6,8 +6,11 @@ DISTANCES = ["5", "10", "15", "20", "25", "Personalizada"]
 
 async def ask_distance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[d] for d in DISTANCES]
-    await update.message.reply_text(
-        "¿Qué distancia máxima quieres buscar? (km)",
+    
+    # Usamos effective_chat para enviar el mensaje directamente
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="¿Qué distancia máxima quieres buscar? (km)",
         reply_markup=ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
     )
 
