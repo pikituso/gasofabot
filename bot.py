@@ -6,6 +6,14 @@ from handlers.fuel_choice import fuel_choice
 from handlers.distance_choice import ask_distance, set_distance
 from handlers.options import handle_options
 from handlers.bot_states import DISTANCIA, CARBURANTE, OPCIONES
+import logging
+
+# Configurar logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
 
 def main():
     app = Application.builder().token(TOKEN).build()

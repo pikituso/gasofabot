@@ -14,5 +14,5 @@ def format_station(estacion, distancia, precio, orden, fuel_name):
         f"📍 _{direccion}, {municipio}, {provincia}_\n"
         f"🚗 Distancia: {distancia:.2f} km\n"
         f"⛽ {fuel_name}: {precio_str}\n"
-        f"{maps_url}"
+        f"🗺️ {maps_url}"
     )
